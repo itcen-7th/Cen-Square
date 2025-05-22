@@ -1,0 +1,29 @@
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-container {
+  flex: 1;
+  display: flex;
+  margin: 0 20%;
+}
+
+.main-content {
+  width: 75%;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.main-content-nobar {
+  width: 100%;
+  border: 1px solid #ccc;
+  text-align: center;
+}
