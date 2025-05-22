@@ -27,10 +27,13 @@ public class MainController {
             Map.of("name", "배달의민족")
     );
 
+    private static final List<String> keywords = List.of("토스", "카카오뱅크", "AI", "ChatGPT", "미라콤");
+
     @GetMapping("/")
     public String showHomePage(Model model) {
         model.addAttribute("posts", DUMMY_POST_TOPICS);
         model.addAttribute("popularCompanies", DUMMY_POPULAR_COMPANIES);
+        model.addAttribute("hotKeywords", keywords);
         return "index";
     }
 }

@@ -1,34 +1,73 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>cen-square 커뮤니티</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>레이아웃 수정</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+        }
+
+        .main-margin {
+            width: 15%;
+            background-color: #ffffff;
+        }
+
+        .main-content {
+            flex: 1;
+            background-color: #e8e8e8;
+            display: flex;
+            border: 3px solid #333;
+        }
+
+        .contents {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+<div class="wrapper">
 
-<!-- Header Include -->
-<div th:replace="fragments/header :: header"></div>
+    <!-- Header Fragment -->
+    <header th:replace="~{fragments/header :: header}"></header>
 
-<!-- Main Body -->
-<main class="main-content">
-    <section class="left-section">
-        <h2 class="section-title">토픽 베스트</h2>
-        <ul class="post-list">
-            <li th:each="post : ${posts}" class="post-item">
-                <span class="tag" th:text="${post.tag}"></span>
-                <a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a>
-                <div class="post-meta">
-                    <span th:text="${post.likes}">0</span> 👍
-                    <span th:text="${post.comments}">0</span> 💬
-                </div>
-            </li>
-        </ul>
-    </section>
-</main>
+    <!-- Main Section -->
+    <div class="main-container">
+        <div class="main-margin"></div>
 
-<!-- Footer Include -->
-<div th:replace="fragments/footer :: footer"></div>
+        <div class="main-content">
+            <div class="contents">
+                Main 콘텐츠 중앙 정렬 예시입니다.
+            </div>
 
+            <!-- nav-bar fragment는 위치만 배치 -->
+            <div class="nav-bar" th:replace="~{fragments/nav-bar :: nav-bar}"></div>
+        </div>
+
+        <div class="main-margin"></div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</div>
 </body>
 </html>
