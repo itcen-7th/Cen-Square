@@ -1,0 +1,132 @@
+<!-- header.html -->
+<header th:fragment="site-header">
+    <style>
+        :root {
+            --primary-color: #005BAC;
+            --text-color: #333333;
+            --bg-color: #F5F7FA;
+            --accent-color: #FEE500;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.8rem 2rem;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid #ccc;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'Arial', sans-serif;
+            font-size: 1.15rem;
+            color: var(--text-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 3rem; /* 기본 간격 */
+        }
+
+        .logo img {
+            height: 3.8rem;
+            object-fit: contain;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-grow: 1;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 1.15rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .buttons button {
+            padding: 0.65rem 1.3rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            font-size: 1.05rem;
+            border-radius: 4px;
+        }
+
+        .write-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .login-btn {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        /* ✅ 모바일 반응형 조정 */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0.5rem 1rem;
+            }
+
+            .header {
+                font-size: 1.0rem;
+            }
+
+            .logo {
+                margin-right: 1.2rem; /* 모바일에서 로고와 홈 사이 좁힘 */
+            }
+
+            .logo img {
+                height: 2.8rem;
+            }
+
+            nav {
+                gap: 1.2rem;
+            }
+
+            nav a {
+                font-size: 1.0rem;
+            }
+
+            .buttons button {
+                font-size: 0.95rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+
+    <div class="header-container">
+        <div class="header">
+            <div class="logo">
+                <img th:src="@{/img/logo-nobg.png}" alt="Blind 로고">
+            </div>
+            <nav>
+                <a href="#">홈</a>
+                <a href="#">게시판</a>
+                <a href="#">근무지 찾기</a>
+            </nav>
+            <div class="buttons">
+                <button class="write-btn">글쓰기</button>
+                <button class="login-btn">로그인</button>
+            </div>
+        </div>
+    </div>
+</header>
