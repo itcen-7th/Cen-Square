@@ -99,3 +99,6 @@ $RECYCLE.BIN/
 
 # CMake
 cmake-build-*/
+
+### General ###
+.env
