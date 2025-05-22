@@ -1,0 +1,9 @@
+<!-- fragments/nav-bar.html -->
+<div th:fragment="nav-bar" style="width: 25%;">
+  <aside style="padding: 3%">
+    <h3>실시간 인기 검색어</h3>
+    <ol>
+      <li th:each="keyword : ${hotKeywords}" th:text="${keyword}">검색어</li>
+    </ol>
+  </aside>
+</div>
