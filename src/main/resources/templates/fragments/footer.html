@@ -1,11 +1,71 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head></head>
-<body>
-<div th:fragment="footer">
+<footer th:fragment="footer">
+  <style>
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.8rem 2rem;
+      /*background-color: var(--bg-color);*/
+      border-bottom: 1px solid;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px; /* 로고와 content 간격 조정 */
+      padding: 20px;
+    }
+
+    .logo img {
+      max-width: 150px;
+      height: auto;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      margin-left: 40px;
+    }
+
+    .privacy {
+      font-weight: bold;
+      margin-bottom: 10px;
+
+    }
+
+    .address {
+      line-height: 1.5;
+    }
+
+    .phoneNumber {
+      margin-top: 5px;
+    }
+
+    p {
+      margin: 5px 0 0;
+    }
+  </style>
+
+  <div class="footer-container">
     <footer class="footer">
-        <p>© 2025 cen-square. All rights reserved.</p>
+      <div class="logo">
+        <img th:src="@{/img/logo-nobg.png}" alt="cenSquare 로고">
+      </div>
+      <div class="content">
+        <div class="privacy">
+          개인정보처리방침
+        </div>
+        <div class="address">
+          경기도 과천시 과천대로 12길 117, 과천펜타원 E동(아이티센타워) 3층
+          <div class="phoneNumber">
+            대표번호 : 02-3497-8330 | FAX : 02-571-6052
+          </div>
+          <p>© 2025 cen-square. All rights reserved.</p>
+        </div>
+      </div>
     </footer>
-</div>
-</body>
-</html>
+  </div>
+</footer>
