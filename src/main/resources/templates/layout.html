@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>CenSquare</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Header Fragment -->
+  <header th:replace="~{fragments/header :: header}"></header>
+
+  <!-- Main Section -->
+  <div class="main-container">
+    <div class="main-content">
+      <p> Main contents </p>
+      <p> 본인의 ui를 넣으시면 됩니다. </p>
+      <p> 게시판 </p>
+      <p> 마이페이지 등 </p>
+    </div>
+    <div class="nav-bar" th:replace="~{fragments/nav-bar :: nav-bar}"></div>
+  </div>
+
+  <!-- Footer Fragment -->
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</div>
+</body>
+</html>
