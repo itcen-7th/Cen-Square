@@ -1,0 +1,48 @@
+package com.itcen.censquare.domain.member.controller;
+
+import com.itcen.censquare.domain.auth.AuthConstants;
+import com.itcen.censquare.domain.auth.oauth.CustomUserDetails;
+import com.itcen.censquare.domain.auth.util.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/member")
+public class MemberController {
+
+  public static final String REDIRECT_AFTER_LOGOUT = "/";
+  private final RedisTemplate<String, String> redisTemplate;
+
+  public MemberController(RedisTemplate<String, String> redisTemplate) {
+    this.redisTemplate = redisTemplate;
+  }
+
+  @PostMapping("/logout")
+  public void logout(@AuthenticationPrincipal CustomUserDetails userDetails,
+      HttpServletRequest request,
+      HttpServletResponse response) throws IOException {
+    String memberId = String.valueOf(userDetails.getMember().getId());
+
+    redisTemplate.delete(AuthConstants.REDIS_REFRESH_TOKEN_PREFIX + memberId);
+
+    ResponseCookie forDeleteRefreshCookie = CookieUtil.deleteRefreshTokenCookie();
+    ResponseCookie forDeleteAccessCookie = CookieUtil.deleteAccessTokenCookie();
+    response.addHeader(HttpHeaders.SET_COOKIE, forDeleteRefreshCookie.toString());
+    response.addHeader(HttpHeaders.SET_COOKIE, forDeleteAccessCookie.toString());
+
+    SecurityContextHolder.clearContext(); //  인증 정보 제거
+    request.getSession().invalidate(); //  세션 무효화
+
+    response.sendRedirect(REDIRECT_AFTER_LOGOUT);
+  }
+
+}
