@@ -10,8 +10,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -35,36 +33,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
-    extractAccessTokenFromRequest(request)
-        .filter(token -> jwtProvider.validateToken(TokenType.ACCESS, token))
-        .map(token -> jwtProvider.getSubject(TokenType.ACCESS, token))
-        .map(Long::valueOf)
-        .map(this::loadUserDetails)
-        .ifPresent(this::setAuthenticate);
+    String token = extractAccessTokenFromRequest(request);
+
+    if (token != null && jwtProvider.validateToken(TokenType.ACCESS, token)) {
+      String subject = jwtProvider.getSubject(TokenType.ACCESS, token);
+      Long memberId = Long.valueOf(subject); // @Todo try catch 예외 발생
+
+      CustomUserDetails userDetails = loadUserDetails(memberId);
+      if (userDetails != null) {
+        setAuthenticate(userDetails);
+      }
+    }
 
     filterChain.doFilter(request, response);
+
   }
 
   /**
    * Request로 부터 token 추출
    */
-  private Optional<String> extractAccessTokenFromRequest(HttpServletRequest request) {
+  private String extractAccessTokenFromRequest(HttpServletRequest request) {
     String header = request.getHeader(HEADER_AUTHORIZATION);
     if (header != null && header.startsWith(TOKEN_PREFIX)) {
-      return Optional.of(header.substring(TOKEN_PREFIX.length()));
+      return header.substring(TOKEN_PREFIX.length());
     }
 
-    return Optional.ofNullable(request.getCookies())
-        .flatMap(cookies -> Arrays.stream(cookies)
-            .filter(cookie -> AuthConstants.COOKIE_ACCESS_TOKEN.equals(cookie.getName()))
-            .map(Cookie::getValue)
-            .findFirst()
-        );
+    if (request.getCookies() != null) {
+      for (Cookie cookie : request.getCookies()) {
+        if (AuthConstants.COOKIE_ACCESS_TOKEN.equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+
+    return null;
   }
 
   private CustomUserDetails loadUserDetails(Long memberId) {
     Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new RuntimeException(ERROR_USER_NOT_FOUND + memberId));
+        .orElse(null);
+    if (member == null) {
+      return null;
+    }
     return new CustomUserDetails(member);
   }
 
@@ -75,6 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userDetails,
             null,
             userDetails.getAuthorities());
+    System.out.println(authentication);
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
