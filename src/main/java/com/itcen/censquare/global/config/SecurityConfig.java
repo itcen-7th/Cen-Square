@@ -43,12 +43,7 @@ public class SecurityConfig {
             .permitAll()
             .anyRequest().authenticated()
         )
-        .formLogin(form -> form
-            .loginPage("/login")
-            .permitAll()
-        )
         .oauth2Login(oauth2 -> oauth2
-            .loginPage("/login")
             .userInfoEndpoint(user -> user.userService(customOAuth2UserService))
             .successHandler(oAuth2SuccessHandler)
         )

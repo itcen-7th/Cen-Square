@@ -16,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  public static final String ERROR_USER_NOT_FOUND = "로그인 사용자를 찾을 수 없습니다. memberId: ";
   public static final String HEADER_AUTHORIZATION = "Authorization";
   public static final String TOKEN_PREFIX = "Bearer ";
 
@@ -85,8 +84,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userDetails,
             null,
             userDetails.getAuthorities());
-    System.out.println(authentication);
     SecurityContextHolder.getContext().setAuthentication(authentication);
+  }
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    String path = request.getRequestURI();
+    return path.startsWith("/oauth2");
   }
 
 }

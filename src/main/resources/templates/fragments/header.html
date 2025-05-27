@@ -1,4 +1,6 @@
 <!-- header.html -->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <header th:fragment="site-header">
   <style>
     :root {
@@ -26,7 +28,7 @@
     .logo {
       display: flex;
       align-items: center;
-      margin-right: 3rem; /* 기본 간격 */
+      margin-right: 3rem;
     }
 
     .logo img {
@@ -58,18 +60,24 @@
       gap: 0.75rem;
     }
 
+    /* 공통 버튼 스타일 (a, button 둘 다 포함) */
+    .buttons a,
     .buttons button {
       padding: 0.65rem 1.3rem;
       font-weight: bold;
-      border: none;
-      cursor: pointer;
       font-size: 1.05rem;
       border-radius: 4px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s, color 0.2s;
     }
 
     .write-btn {
       background-color: var(--primary-color);
       color: white;
+      border-color: var(--primary-color);
     }
 
     .login-btn {
@@ -78,7 +86,19 @@
       border: 1px solid var(--primary-color);
     }
 
-    /* ✅ 모바일 반응형 조정 */
+    .logout-btn,
+    .mypage-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: 1px solid var(--primary-color);
+    }
+
+    .buttons a:hover,
+    .buttons button:hover {
+      opacity: 0.85;
+    }
+
+    /* ✅ 모바일 반응형 */
     @media (max-width: 768px) {
       .header-container {
         padding: 0.5rem 1rem;
@@ -89,7 +109,7 @@
       }
 
       .logo {
-        margin-right: 1.2rem; /* 모바일에서 로고와 홈 사이 좁힘 */
+        margin-right: 1.2rem;
       }
 
       .logo img {
@@ -104,12 +124,14 @@
         font-size: 1.0rem;
       }
 
+      .buttons a,
       .buttons button {
         font-size: 0.95rem;
         padding: 0.5rem 1rem;
       }
     }
   </style>
+
 
   <div class="header-container">
     <div class="header">
@@ -122,9 +144,25 @@
         <a href="#">근무지 찾기</a>
       </nav>
       <div class="buttons">
-        <button class="write-btn">글쓰기</button>
-        <button class="login-btn">로그인</button>
+        <!-- ✅ 로그인 상태 -->
+        <div sec:authorize="isAuthenticated()" style="display: flex; gap: 0.75rem;">
+          <span>사용자 ID: <span sec:authentication="principal.member.id"></span></span>
+
+          <a class="mypage-btn" th:href="@{/mypage}">마이페이지</a>
+          <form class="logout-form" id="logoutForm" action="/api/v1/member/logout" method="POST">
+            <button type="submit" class="logout-btn">로그아웃</button>
+          </form>
+        </div>
+
+        <!-- ❌ 로그인 안 한 상태 -->
+        <a class="login-btn"
+           sec:authorize="isAnonymous()"
+           href="/oauth2/authorization/kakao">
+          로그인
+        </a>
       </div>
+
+
     </div>
   </div>
 </header>
