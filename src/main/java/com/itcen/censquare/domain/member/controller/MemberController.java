@@ -35,22 +35,23 @@ public class MemberController {
   }
 
   @PostMapping("/logout")
-  public void logout(@AuthenticationPrincipal CustomUserDetails userDetails,
+  public ResponseEntity<String> logout(@AuthenticationPrincipal CustomUserDetails userDetails,
       HttpServletRequest request,
       HttpServletResponse response) throws IOException {
     String memberId = String.valueOf(userDetails.getMember().getId());
 
     redisTemplate.delete(AuthConstants.REDIS_REFRESH_TOKEN_PREFIX + memberId);
+    request.getSession().setAttribute("logout", true);
 
-    ResponseCookie forDeleteRefreshCookie = CookieUtil.deleteRefreshTokenCookie();
-    ResponseCookie forDeleteAccessCookie = CookieUtil.deleteAccessTokenCookie();
-    response.addHeader(HttpHeaders.SET_COOKIE, forDeleteRefreshCookie.toString());
-    response.addHeader(HttpHeaders.SET_COOKIE, forDeleteAccessCookie.toString());
+    ResponseCookie deleteAccessToken = CookieUtil.deleteAccessTokenCookie();
+    ResponseCookie deleteRefreshToken = CookieUtil.deleteRefreshTokenCookie();
+
+    response.addHeader(HttpHeaders.SET_COOKIE, deleteAccessToken.toString());
+    response.addHeader(HttpHeaders.SET_COOKIE, deleteRefreshToken.toString());
 
     SecurityContextHolder.clearContext(); //  인증 정보 제거
     request.getSession().invalidate(); //  세션 무효화
-
-    response.sendRedirect(REDIRECT_AFTER_LOGOUT);
+    return ResponseEntity.ok("로그아웃 완료");
   }
 
   @GetMapping("/me")

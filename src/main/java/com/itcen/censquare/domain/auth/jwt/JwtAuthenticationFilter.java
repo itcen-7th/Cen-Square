@@ -32,15 +32,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
+    System.out.println("[JwtAuthenticationFilter] doFilterInternal");
     String token = extractAccessTokenFromRequest(request);
+    if (token != null) {
+      if (jwtProvider.validateToken(TokenType.ACCESS, token)) {
+        String subject = jwtProvider.getSubject(TokenType.ACCESS, token);
+        Long memberId = Long.valueOf(subject); // @Todo try catch 예외 발생
 
-    if (token != null && jwtProvider.validateToken(TokenType.ACCESS, token)) {
-      String subject = jwtProvider.getSubject(TokenType.ACCESS, token);
-      Long memberId = Long.valueOf(subject); // @Todo try catch 예외 발생
-
-      CustomUserDetails userDetails = loadUserDetails(memberId);
-      if (userDetails != null) {
-        setAuthenticate(userDetails);
+        CustomUserDetails userDetails = loadUserDetails(memberId);
+        if (userDetails != null) {
+          setAuthenticate(userDetails);
+        }
+      } else {
+        SecurityContextHolder.clearContext();
       }
     }
 
@@ -64,6 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
       }
     }
+
+    System.out.println("JWTAuthenticationFilter cookie 못! 가져옴 access token ");
 
     return null;
   }
@@ -90,7 +96,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getRequestURI();
-    return path.startsWith("/oauth2");
+    return path.startsWith("/oauth2")
+        || path.startsWith("/login/oauth2/code")
+        || path.startsWith("/login")
+        || path.startsWith("/css")
+        || path.startsWith("/js")
+        || path.startsWith("/img")
+        || path.startsWith("/favicon.ico");
   }
 
 }
