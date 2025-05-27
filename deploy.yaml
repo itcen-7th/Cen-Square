@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   cen-square:
-    image: cen-square:latest
+    image: we8865/cen-square:latest
     container_name: cen-square
     env_file:
       - ${ENV_BE_PATH}
