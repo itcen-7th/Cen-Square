@@ -4,8 +4,8 @@ services:
   cen-square:
     image: cen-square:latest
     container_name: cen-square
-    env-files:
-      - ${ENV_PATH}
+    env_file:
+      - ${ENV_BE_PATH}
     ports: 
       - "8080:8080"
     restart: always
