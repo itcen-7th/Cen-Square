@@ -1,6 +1,15 @@
 version: "3.9"
 
 services:
+  cen-square:
+    image: cen-square:latest
+    container_name: cen-square
+    env-files:
+      - /home/ubuntu/my-proj/
+    ports: 
+      - "8080:8080"
+    restart: always
+
   redis:
     image: redis:latest
     container_name: redis
