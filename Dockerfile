@@ -13,7 +13,7 @@ RUN gradle build --no-daemon -x test
 
 
 # Runtime stage
-FROM openjdk:17-jdk
+FROM arm64v8/openjdk:17-jdk
 WORKDIR /app
 
 # jar 파일 복사
