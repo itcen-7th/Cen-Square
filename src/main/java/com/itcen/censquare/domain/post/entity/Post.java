@@ -45,9 +45,11 @@ public class Post extends TimeStampedEntity {
   @Column(name = "content", columnDefinition = "TEXT")
   private String content;
 
+  @Builder.Default
   @Column(name = "view_count")
   private Long viewCount = 0L;
 
+  @Builder.Default
   @Column(name = "like_count")
   private Long likeCount = 0L;
 
