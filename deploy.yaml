@@ -3,7 +3,7 @@ services:
     image: we8865/cen-square:latest
     container_name: cen-square
     env_file:
-      - /home/ubuntu/env.d/.env-be-deploy
+      - ${ENV_BE_PATH}
     ports: 
       - "8080:8080"
     restart: always
