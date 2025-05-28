@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Category {
-    GENERAL("자유"),
-    CORPORATE("법인"),
-    GENERATION("기수");
+  GENERAL("자유"),
+  CORPORATE("법인"),
+  GENERATION("기수");
 
-    private final String text;
+  private final String text;
 }

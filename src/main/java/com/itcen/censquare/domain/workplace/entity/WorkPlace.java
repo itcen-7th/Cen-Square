@@ -2,7 +2,13 @@ package com.itcen.censquare.domain.workplace.entity;
 
 import com.itcen.censquare.global.entity.TimeStampedEntity;
 import com.itcen.censquare.global.entity.enums.Corporation;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,27 +21,27 @@ import lombok.NoArgsConstructor;
 @Entity
 public class WorkPlace extends TimeStampedEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "work_place_id")
-    private Long workPlaceId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "work_place_id")
+  private Long workPlaceId;
 
-    @Enumerated(EnumType.STRING)
-    private Corporation corporation;
+  @Enumerated(EnumType.STRING)
+  private Corporation corporation;
 
-    @Column(nullable = false, length = 50)
-    private String officeLocation;
+  @Column(nullable = false, length = 50)
+  private String officeLocation;
 
-    @Column(length = 50)
-    private String divisionName;
+  @Column(length = 50)
+  private String divisionName;
 
-    private Double latitude;
+  private Double latitude;
 
-    private Double longitude;
+  private Double longitude;
 
-    @Column(length = 50)
-    private String sido;
+  @Column(length = 50)
+  private String sido;
 
-    @Column(length = 50)
-    private String gungu;
+  @Column(length = 50)
+  private String gungu;
 }
