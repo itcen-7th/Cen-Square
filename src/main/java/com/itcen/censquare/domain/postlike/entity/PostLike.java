@@ -1,4 +1,4 @@
-package com.itcen.censquare.domain.like.entity;
+package com.itcen.censquare.domain.postlike.entity;
 
 import com.itcen.censquare.domain.member.entity.Member;
 import com.itcen.censquare.domain.post.entity.Post;
@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +19,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Like extends CreatedBaseEntity {
+public class PostLike extends CreatedBaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
