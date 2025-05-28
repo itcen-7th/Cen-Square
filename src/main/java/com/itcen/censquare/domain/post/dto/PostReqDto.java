@@ -5,7 +5,7 @@ import com.itcen.censquare.domain.post.entity.enums.Category;
 import lombok.Getter;
 
 @Getter
-public class PostReq {
+public class PostReqDto {
 
   private Long memberId;
   private Category category;

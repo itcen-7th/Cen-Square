@@ -1,6 +1,6 @@
 package com.itcen.censquare.domain.post.service;
 
-import com.itcen.censquare.domain.post.dto.PostReq;
+import com.itcen.censquare.domain.post.dto.PostReqDto;
 import com.itcen.censquare.domain.post.entity.Post;
 import com.itcen.censquare.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,19 +10,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final PostRepository postRepository;
+  private final PostRepository postRepository;
 
-    public void createPost(PostReq request) {
-        Post post = Post.builder()
+  public void createPost(PostReqDto request) {
+    Post post = Post.builder()
 //                .memberId(request.getMemberId())
-                .category(request.getCategory())
-                .title(request.getTitle())
-                .content(request.getContent())
-                .viewCount(0L)
-                .likeCount(0L)
-                .deleted(false)
-                .build();
+        .category(request.getCategory())
+        .title(request.getTitle())
+        .content(request.getContent())
+        .viewCount(0L)
+        .likeCount(0L)
+        .deleted(false)
+        .build();
 
-        postRepository.save(post);
-    }
+    postRepository.save(post);
+  }
 }
