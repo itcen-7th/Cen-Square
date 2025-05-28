@@ -6,7 +6,8 @@ import com.itcen.censquare.domain.auth.jwt.JwtProvider;
 import com.itcen.censquare.domain.auth.jwt.TokenType;
 import com.itcen.censquare.domain.auth.util.CookieUtil;
 import com.itcen.censquare.domain.member.entity.Member;
-import com.itcen.censquare.domain.member.entity.Role;
+import com.itcen.censquare.domain.member.entity.enums.Provider;
+import com.itcen.censquare.domain.member.entity.enums.Role;
 import com.itcen.censquare.domain.member.repository.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-  private static final String PROVIDER_KAKAO = "kakao";
   private static final String REDIRECT_URL_AFTER_LOGIN = "/";
   private static final String OAUTH_ID_ATTRIBUTE = "id";
   public static final String ERROR_MISSING_OAUTH_ID = "OAuth 응답에 'id' 가 존재하지 않습니다.";
@@ -48,7 +48,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     String oauthId = extractOAuth2Id(oAuth2User);
 
     Member member = getOrCreateMember(oauthId);
-    generateTokensAndSetCookies(response, String.valueOf(member.getId()));
+    generateTokensAndSetCookies(response, String.valueOf(member.getMemberId()));
 
     response.sendRedirect(REDIRECT_URL_AFTER_LOGIN);
   }
@@ -60,10 +60,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
   }
 
   private Member getOrCreateMember(String oauthId) {
-    return memberRepository.findByOauthIdAndProvider(oauthId, PROVIDER_KAKAO)
+    return memberRepository.findByOauthIdAndProvider(oauthId, Provider.KAKAO)
         .orElseGet(
             () -> memberRepository.save(
-                new Member(oauthId, PROVIDER_KAKAO, Role.USER)));
+                Member.builder()
+                    .oauthId(oauthId)
+                    .provider(Provider.KAKAO)
+                    .role(Role.USER)
+                    .build()
+
+            ))
+        ;
   }
 
   /**

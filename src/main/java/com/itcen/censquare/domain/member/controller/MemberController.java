@@ -38,7 +38,7 @@ public class MemberController {
   public void logout(@AuthenticationPrincipal CustomUserDetails userDetails,
       HttpServletRequest request,
       HttpServletResponse response) throws IOException {
-    String memberId = String.valueOf(userDetails.getMember().getId());
+    String memberId = String.valueOf(userDetails.getMember().getMemberId());
 
     redisTemplate.delete(AuthConstants.REDIS_REFRESH_TOKEN_PREFIX + memberId);
 
