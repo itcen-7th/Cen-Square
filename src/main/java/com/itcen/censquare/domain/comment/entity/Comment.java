@@ -1,19 +1,17 @@
-package com.itcen.censquare.domain.post.entity;
+package com.itcen.censquare.domain.comment.entity;
 
 import com.itcen.censquare.domain.member.entity.Member;
-import com.itcen.censquare.domain.post.entity.enums.Category;
+import com.itcen.censquare.domain.post.entity.Post;
 import com.itcen.censquare.global.entity.TimeStampedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,38 +23,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Post extends TimeStampedEntity {
+public class Comment extends TimeStampedEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "post_id")
-  private Long postId;
+  @Column(name = "comment_id")
+  private Long commentId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "category", nullable = false)
-  private Category category;
+  @ManyToOne
+  @JoinColumn(name = "post_id", nullable = false)
+  private Post post;
 
-  @Column(name = "title", nullable = false, length = 255)
-  private String title;
-
-  @Column(name = "content", columnDefinition = "TEXT")
+  @Lob
+  @Column(nullable = false)
   private String content;
 
-  @Builder.Default
-  @Column(name = "view_count")
-  private Long viewCount = 0L;
-
-  @Builder.Default
-  @Column(name = "like_count")
-  private Long likeCount = 0L;
-
-  @Column(name = "deleted")
-  private Boolean deleted;
-
-  @Column(name = "deleted_at")
-  private LocalDateTime deletedAt;
 }
