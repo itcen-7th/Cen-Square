@@ -38,6 +38,7 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: ${KAKAO_REDIRECT_URI}
             scope:
+              - account_email
               - friends
               - talk_message
             client-name: kakao

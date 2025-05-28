@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
@@ -47,7 +48,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
     String oauthId = extractOAuth2Id(oAuth2User);
 
-    Member member = getOrCreateMember(oauthId);
+    Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes()
+        .get("kakao_account");
+    String email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
+
+    Member member = getOrCreateMember(oauthId, email);
     generateTokensAndSetCookies(response, String.valueOf(member.getMemberId()));
 
     response.sendRedirect(REDIRECT_URL_AFTER_LOGIN);
@@ -59,7 +64,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         .orElseThrow(() -> new IllegalStateException(ERROR_MISSING_OAUTH_ID));
   }
 
-  private Member getOrCreateMember(String oauthId) {
+  private Member getOrCreateMember(String oauthId, String email) {
     return memberRepository.findByOauthIdAndProvider(oauthId, Provider.KAKAO)
         .orElseGet(
             () -> memberRepository.save(
@@ -67,6 +72,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .oauthId(oauthId)
                     .provider(Provider.KAKAO)
                     .role(Role.USER)
+                    .email(email)
                     .build()
 
             ))
