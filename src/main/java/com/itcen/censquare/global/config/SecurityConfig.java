@@ -44,7 +44,14 @@ public class SecurityConfig {
             .permitAll()
             .anyRequest().authenticated()
         )
+        .formLogin(form -> form
+            .loginPage("/login")
+            .permitAll()
+        )
         .oauth2Login(oauth2 -> oauth2
+            .loginPage("/oauth2/authorization/kakao") // 인증 필요시 자동 리다이렉트
+            .defaultSuccessUrl("/", true)
+            .failureUrl("/login?error=true")
             .userInfoEndpoint(user -> user.userService(customOAuth2UserService))
             .successHandler(oAuth2SuccessHandler)
         )

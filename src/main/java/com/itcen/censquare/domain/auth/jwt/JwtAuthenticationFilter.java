@@ -31,8 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request,
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-
-    System.out.println("[JwtAuthenticationFilter] doFilterInternal");
     String token = extractAccessTokenFromRequest(request);
     if (token != null) {
       if (jwtProvider.validateToken(TokenType.ACCESS, token)) {
@@ -68,9 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
       }
     }
-
-    System.out.println("JWTAuthenticationFilter cookie 못! 가져옴 access token ");
-
+    
     return null;
   }
 

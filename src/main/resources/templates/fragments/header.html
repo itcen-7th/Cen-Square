@@ -79,16 +79,11 @@
       border-color: var(--primary-color);
     }
 
-    .login-btn {
+    .login-btn,
+    .mypage-btn,
+    .logout-btn {
       background-color: white;
       color: var(--primary-color);
-      border: 1px solid var(--primary-color);
-    }
-
-    .logout-btn,
-    .mypage-btn {
-      background-color: var(--primary-color);
-      color: white;
       border: 1px solid var(--primary-color);
     }
 
@@ -96,6 +91,7 @@
     .buttons button:hover {
       opacity: 0.85;
     }
+
 
     /* ✅ 모바일 반응형 */
     @media (max-width: 768px) {
@@ -144,15 +140,17 @@
       </nav>
       <div class="buttons">
         <div th:if="${not #authorization.expression('isAuthenticated()')}">
-          <a class="login-btn" href="/oauth2/authorization/kakao">로그인</a>
+          <a class="login-btn" href="#"
+             onclick="window.location='/oauth2/authorization/kakao'">로그인</a>
         </div>
 
-        <div th:if="${#authorization.expression('isAuthenticated()')}">
+        <div th:if="${#authorization.expression('isAuthenticated()')}"
+             style="display: flex; gap: 0.75rem;">
+          <a class="mypage-btn" href="/mypage">마이페이지</a>
           <form class="logout-form" id="logoutForm" action="/api/v1/member/logout" method="POST">
             <button type="submit" class="logout-btn">로그아웃</button>
           </form>
         </div>
-
       </div>
     </div>
   </div>
