@@ -1,6 +1,7 @@
 package com.itcen.censquare.domain.post.entity;
 
-import com.itcen.censquare.domain.post.entity.Enum.Category;
+import com.itcen.censquare.domain.member.entity.Member;
+import com.itcen.censquare.domain.post.entity.enums.Category;
 import com.itcen.censquare.global.baseentity.TimeStampedEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,9 +22,9 @@ public class Post extends TimeStampedEntity {
     @Column(name = "post_id")
     private Long postId;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)

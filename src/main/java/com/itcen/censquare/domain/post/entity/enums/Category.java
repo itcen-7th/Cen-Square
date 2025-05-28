@@ -1,4 +1,4 @@
-package com.itcen.censquare.domain.post.entity.Enum;
+package com.itcen.censquare.domain.post.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
