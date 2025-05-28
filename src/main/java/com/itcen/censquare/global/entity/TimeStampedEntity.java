@@ -1,4 +1,4 @@
-package com.itcen.censquare.global.baseentity;
+package com.itcen.censquare.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

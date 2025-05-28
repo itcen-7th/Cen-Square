@@ -3,7 +3,7 @@ package com.itcen.censquare.domain.member.entity;
 import com.itcen.censquare.domain.member.entity.enums.Provider;
 import com.itcen.censquare.domain.member.entity.enums.Role;
 import com.itcen.censquare.domain.organization.entity.Organization;
-import com.itcen.censquare.global.baseentity.TimeStampedEntity;
+import com.itcen.censquare.global.entity.TimeStampedEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

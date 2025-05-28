@@ -2,7 +2,7 @@ package com.itcen.censquare.domain.like.entity;
 
 import com.itcen.censquare.domain.member.entity.Member;
 import com.itcen.censquare.domain.post.entity.Post;
-import com.itcen.censquare.global.baseentity.CreatedBaseEntity;
+import com.itcen.censquare.global.entity.CreatedBaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

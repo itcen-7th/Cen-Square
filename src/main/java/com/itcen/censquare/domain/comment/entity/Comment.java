@@ -2,7 +2,7 @@ package com.itcen.censquare.domain.comment.entity;
 
 import com.itcen.censquare.domain.member.entity.Member;
 import com.itcen.censquare.domain.post.entity.Post;
-import com.itcen.censquare.global.baseentity.TimeStampedEntity;
+import com.itcen.censquare.global.entity.TimeStampedEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
