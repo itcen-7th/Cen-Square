@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>근무지 지도</title>
+
+  <!-- 카카오 지도 API (clusterer 라이브러리 포함) -->
+  <script
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=217dee136be12cc8c6cdcb841b6bd76f&libraries=clusterer"></script>
+
+  <!-- 페이지 전용 CSS 파일 불러오기 -->
+  <link rel="stylesheet" href="/css/workplace.css"/>
+</head>
+<body>
+<!-- 공통 Header 삽입 -->
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<!-- 필터 영역 -->
+<div class="filters">
+  <form method="get" action="/workplace">
+    <!-- 법인 선택 드롭다운 -->
+    <select name="corp">
+      <option value="">법인 선택</option>
+      <option value="아이티센 엔텍">아이티센 엔텍</option>
+      <option value="아이티센 클로잇">아이티센 클로잇</option>
+      <option value="아이티센 비즈온">아이티센 CTS</option>
+    </select>
+
+    <!-- 지역 선택 드롭다운 -->
+    <select name="region">
+      <option value="">지역 선택</option>
+      <option value="서울">서울</option>
+      <option value="대구">대구</option>
+      <option value="부산">부산</option>
+    </select>
+
+    <!-- 소속 본부 선택 드롭다운 -->
+    <select name="division">
+      <option value="">소속 본부</option>
+      <option value="교육사업부">교육사업부</option>
+      <option value="플랫폼본부">플랫폼본부</option>
+    </select>
+
+    <button type="submit">필터 적용</button>
+  </form>
+</div>
+
+<!-- 지도 + 테이블 레이아웃 (가로 배치) -->
+<div style="display: flex">
+  <!-- 왼쪽: 지도 표시 영역 -->
+  <div id="map" style="width: 50%; height: 500px"></div>
+
+  <!-- 오른쪽: 테이블 영역 -->
+  <div style="width: 50%">
+    <table>
+      <thead>
+      <tr>
+        <th>법인명</th>
+        <th>주소</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- 서버에서 전달한 workplaces 리스트를 반복 출력 -->
+      <tr th:each="workplace : ${workplaces}">
+        <td th:text="${workplace.corporationName}">법인명</td>
+        <td th:text="${workplace.address}">주소</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 자바스크립트: 지도 마커 로직 -->
+<script th:inline="javascript">
+  // 서버에서 전달된 근무지 리스트를 자바스크립트 변수에 저장
+  let workplaces = /*[[${workplaces}]]*/ [];
+
+  // 카카오 맵 초기화 (중앙 좌표는 한반도 중심)
+  let map = new kakao.maps.Map(document.getElementById("map"), {
+    center: new kakao.maps.LatLng(36.5, 127.5),
+    level: 8,
+  });
+
+  // 법인명에 따라 마커 색상을 지정하는 맵 (이미지 URL은 카카오 제공)
+  const markerImages = {
+    "아이티센 엔텍":
+        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+    "아이티센 클로잇":
+        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_blue.png",
+    "아이티센 비즈온":
+        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_green.png",
+  };
+
+  // workplaces 리스트를 반복하며 마커 생성
+  workplaces.forEach((w) => {
+    // 법인명에 맞는 이미지 URL 찾기 (없으면 기본 빨간 마커)
+    const imageSrc =
+        markerImages[w.corporationName] || markerImages["아이티센 엔텍"];
+
+    // 마커 이미지 크기 설정
+    const imageSize = new kakao.maps.Size(24, 35);
+    const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+    // 마커 생성 및 지도에 표시
+    const marker = new kakao.maps.Marker({
+      position: new kakao.maps.LatLng(w.latitude, w.longitude),
+      map: map,
+      image: markerImage,
+    });
+  });
+</script>
+
+<!-- 공통 Footer 삽입 -->
+<th:block th:replace="fragments/footer :: footer"></th:block>
+</body>
+</html>
