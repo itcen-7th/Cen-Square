@@ -32,6 +32,8 @@ jobs:
           echo 'WORKDIR /app' >> Dockerfile
           echo 'COPY build/libs/*.jar app.jar' >> Dockerfile
           echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
+          echo "=======Dockerfile 내용======="
+          cat Dockerfile
 
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
