@@ -41,8 +41,9 @@ jobs:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "build/libs/*,Dockerfile" 
+          source: "Dockerfile build gradlew gradlew.bat"
           target: "~/spring-deploy"
+          
 
       - name: SSH into Bastion and deploy to Spring EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -52,6 +53,8 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             set -e  # 에러 발생 시 즉시 종료
+            echo "[디버깅] Bastion ~/spring-deploy 파일 목록:"
+            ls -al ~/spring-deploy
 
             echo "Private EC2로 SSH 접속 중입니다"
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
