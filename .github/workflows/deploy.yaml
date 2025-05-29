@@ -49,14 +49,24 @@ jobs:
             else
           echo "Dockerfile이 존재하지 않습니다."
           fi    
-
+      - name: Check files for SCP
+         run: |
+          echo "== 현재 디렉토리 확인 =="
+          pwd
+          echo "== Dockerfile 확인 =="
+          ls -l Dockerfile || echo "없음!"
+          echo "== JAR 파일 확인 =="
+          ls -l build/libs/*.jar || echo "JAR 파일 없음!"
+      
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "Dockerfile build/libs/*.jar gradlew gradlew.bat"
+          source: |
+            Dockerfile
+            build/libs/*.jar
           target: "~/spring-deploy"
           
       - name: SSH into Bastion and deploy to Spring EC2
