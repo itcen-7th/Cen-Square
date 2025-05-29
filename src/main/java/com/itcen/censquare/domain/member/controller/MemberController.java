@@ -3,7 +3,7 @@ package com.itcen.censquare.domain.member.controller;
 import com.itcen.censquare.domain.auth.AuthConstants;
 import com.itcen.censquare.domain.auth.oauth.CustomUserDetails;
 import com.itcen.censquare.domain.auth.util.CookieUtil;
-import com.itcen.censquare.domain.member.dto.MemberResDto;
+import com.itcen.censquare.domain.member.dto.MemberRespDto;
 import com.itcen.censquare.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,7 +50,7 @@ public class MemberController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<MemberResDto> getMyInfo(
+  public ResponseEntity<MemberRespDto> getMyInfo(
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     return ResponseEntity.ok(memberService.getMyInfo(userDetails.getMember()));
   }

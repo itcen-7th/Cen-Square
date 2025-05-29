@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberResDto {
+public class MemberRespDto {
 
   private Long memberId;
   private Role role;
