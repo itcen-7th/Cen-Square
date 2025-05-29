@@ -59,6 +59,9 @@ jobs:
           echo "== JAR 파일 확인 =="
           ls -l build/libs/*.jar || echo "JAR 파일 없음!"
       
+      - name: Rename jar for consistent SCP
+        run: cp build/libs/cen-square-0.0.1-SNAPSHOT.jar app.jar
+
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -67,7 +70,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: |
             Dockerfile
-            build/libs/*.jar
+            app.jar
           target: "~/spring-deploy"
           
       - name: SSH into Bastion and deploy to Spring EC2
