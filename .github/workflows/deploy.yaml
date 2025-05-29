@@ -35,16 +35,30 @@ jobs:
           echo "=======Dockerfile 내용======="
           cat Dockerfile
 
+      - name: Check files before SCP
+        run: |
+          echo "[디버깅] 현재 디렉토리 파일 목록:"
+          ls -al
+
+          echo "[디버깅] build/libs 디렉토리 파일 목록:"
+          ls -al build/libs || echo "build/libs 디렉토리가 없습니다."
+
+          echo "[디버깅] Dockerfile 존재 여부 확인:"
+            if [ -f Dockerfile ]; then
+          echo "Dockerfile이 존재합니다."
+            else
+          echo "Dockerfile이 존재하지 않습니다."
+          fi    
+
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "Dockerfile build gradlew gradlew.bat"
+          source: "Dockerfile build/libs/*.jar gradlew gradlew.bat"
           target: "~/spring-deploy"
           
-
       - name: SSH into Bastion and deploy to Spring EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
