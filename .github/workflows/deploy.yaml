@@ -81,9 +81,13 @@ jobs:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: 
-              - Dockerfile
-              - app.jar
+          script: |
+            if [ -d ~/spring-deploy ]; then
+              echo "폴더가 존재합니다."
+            else
+              echo "폴더가 없습니다."
+            fi
+          source: "./Dockerfile app.jar"
           target: "~/spring-deploy"
           debug: true
           
