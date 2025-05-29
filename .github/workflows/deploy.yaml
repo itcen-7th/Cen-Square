@@ -131,6 +131,15 @@ jobs:
               echo "기존 파일 정리"
               [ "$PWD" = "$HOME/spring-app" ] && rm -rf *
 
+              echo "[DEBUG] Bastion에서 프로젝트 복사 전 spring-deploy 내용 확인:"
+              ls -al /home/ubuntu/spring-deploy
+
+              echo "복사 시작"
+              cp -av /home/ubuntu/spring-deploy/* .
+
+              echo "[DEBUG] 복사 후 spring-app 디렉토리 내용:"
+              ls -al
+
               echo "Bastion에서 프로젝트 복사합니다"
               cp -a /home/ubuntu/spring-deploy/. .
 
