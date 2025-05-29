@@ -76,12 +76,12 @@ jobs:
         run: ls -al
 
       - name: Upload project to Bastion server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v0.1.8
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "Dockerfile app.jar"
+          source: "./Dockerfile ./app.jar"
           target: "~/spring-deploy"
           debug: true
           
