@@ -62,12 +62,18 @@ jobs:
       - name: Rename jar for consistent SCP
         run: cp build/libs/cen-square-0.0.1-SNAPSHOT.jar ./app.jar
 
+      - name: Confirm app.jar existence
+        run: ls -l app.jar
+
       - name: Check existence of files
         run: |
           echo "== Current Directory =="
           pwd
           echo "== Files =="
           ls -al
+
+      - name: Final check before SCP
+        run: ls -al
 
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
