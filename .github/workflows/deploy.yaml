@@ -52,29 +52,29 @@ jobs:
           script: |
             set -e  # 에러 발생 시 즉시 종료
 
-            echo "Private EC2로 SSH 접속 중"
+            echo "Private EC2로 SSH 접속 중입니다"
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
-              echo "Spring EC2 접속 성공"
+              echo "Spring EC2 접속 성공했습니다다"
 
-              echo "spring-app 디렉토리로 이동 또는 생성"
+              echo "spring-app 디렉토리로 이동 또는 생성합니다"
               cd ~/spring-app || mkdir -p ~/spring-app && cd ~/spring-app
 
               echo "기존 파일 정리"
               [ "$PWD" = "$HOME/spring-app" ] && rm -rf *
 
-              echo "Bastion에서 프로젝트 복사"
+              echo "Bastion에서 프로젝트 복사합니다"
               cp -r ~/spring-deploy/* .
 
-              echo "기존 Docker 컨테이너 정리"
+              echo "기존 Docker 컨테이너 정리합니다"
               docker stop spring-app || true
               docker rm spring-app || true
 
-              echo "Docker 이미지 빌드 시작"
+              echo "Docker 이미지 빌드 시작합니다"
               docker build -t spring-app .
 
-              echo "Docker 컨테이너 실행"
+              echo "Docker 컨테이너 실행합니다"
               docker run -d --name spring-app -p 8888:8080 spring-app
 
-              echo "배포 완료"
+              echo "배포 완료했습니다"
             EOF
