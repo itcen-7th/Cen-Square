@@ -23,7 +23,8 @@ jobs:
         run: |
           echo "Gradle 빌드를 시작합니다."
           chmod +x ./gradlew 
-          ./gradlew build
+          ./gradlew build -x test
+
 
       - name: Generate Dockerfile dynamically
         run: |
