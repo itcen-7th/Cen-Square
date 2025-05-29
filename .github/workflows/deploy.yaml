@@ -75,8 +75,8 @@ jobs:
       - name: Final check before SCP
         run: ls -al
 
-      - name: Upload project to Bastion server
-        uses: appleboy/scp-action@v0.1.7
+      - name: Check if remote directory exists
+        uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
@@ -87,6 +87,13 @@ jobs:
             else
               echo "폴더가 없습니다."
             fi
+
+      - name: Upload project to Bastion server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.BASTION_USER }}
+          key: ${{ secrets.EC2_KEY }}
           source: "./Dockerfile app.jar"
           target: "~/spring-deploy"
           debug: true
