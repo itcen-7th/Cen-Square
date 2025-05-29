@@ -134,8 +134,12 @@ jobs:
               echo "[DEBUG] Bastion에서 프로젝트 복사 전 spring-deploy 내용 확인:"
               ls -al /home/ubuntu/spring-deploy
 
-              echo "복사 시작"
-              cp -av /home/ubuntu/spring-deploy/* .
+              echo "[Bastion] Spring EC2로 Dockerfile 전송"
+              scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+
+              echo "[Bastion] Spring EC2로 app.jar 전송"
+              scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+
 
               echo "[DEBUG] 복사 후 spring-app 디렉토리 내용:"
               ls -al
