@@ -64,7 +64,7 @@ jobs:
               [ "$PWD" = "$HOME/spring-app" ] && rm -rf *
 
               echo "Bastion에서 프로젝트 복사합니다"
-              cp -r ~/spring-deploy/* .
+              cp -r /home/ubuntu/spring-deploy .
 
               echo "기존 Docker 컨테이너 정리합니다"
               docker stop spring-app || true
