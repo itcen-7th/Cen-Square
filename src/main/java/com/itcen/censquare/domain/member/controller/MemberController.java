@@ -8,6 +8,7 @@ import com.itcen.censquare.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/member")
 public class MemberController {
 
@@ -27,12 +29,6 @@ public class MemberController {
 
   private final RedisTemplate<String, String> redisTemplate;
   private final MemberService memberService;
-
-  public MemberController(RedisTemplate<String, String> redisTemplate,
-      MemberService memberService) {
-    this.redisTemplate = redisTemplate;
-    this.memberService = memberService;
-  }
 
   @PostMapping("/logout")
   public void logout(@AuthenticationPrincipal CustomUserDetails userDetails,

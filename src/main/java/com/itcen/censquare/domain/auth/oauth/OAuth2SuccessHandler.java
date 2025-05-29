@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -25,6 +26,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
   private static final String REDIRECT_URL_AFTER_LOGIN = "/";
@@ -34,13 +36,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
   private final JwtProvider jwtProvider;
   private final MemberRepository memberRepository;
   private final StringRedisTemplate redisTemplate;
-
-  public OAuth2SuccessHandler(JwtProvider jwtProvider, MemberRepository memberRepository,
-      StringRedisTemplate redisTemplate) {
-    this.jwtProvider = jwtProvider;
-    this.memberRepository = memberRepository;
-    this.redisTemplate = redisTemplate;
-  }
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

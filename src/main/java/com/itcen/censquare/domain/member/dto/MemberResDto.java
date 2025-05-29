@@ -1,15 +1,23 @@
 package com.itcen.censquare.domain.member.dto;
 
-import com.itcen.censquare.domain.member.entity.Role;
+import com.itcen.censquare.domain.member.entity.enums.Role;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberResDto {
 
-  private final Long id;
-  private final String provider;
-  private final Role role;
+  private Long memberId;
+  private Role role;
+  private String oauthId;
+  private Long batchNumber;
+  private String nickname;
+  private String name;
+  private String email;
 
 }

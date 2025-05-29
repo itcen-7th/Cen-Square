@@ -10,10 +10,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   public static final String HEADER_AUTHORIZATION = "Authorization";
@@ -21,11 +23,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtProvider jwtProvider;
   private final MemberRepository memberRepository;
-
-  public JwtAuthenticationFilter(JwtProvider jwtProvider, MemberRepository memberRepository) {
-    this.jwtProvider = jwtProvider;
-    this.memberRepository = memberRepository;
-  }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
@@ -66,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
       }
     }
-    
+
     return null;
   }
 

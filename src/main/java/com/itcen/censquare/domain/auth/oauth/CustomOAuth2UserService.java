@@ -1,6 +1,6 @@
 package com.itcen.censquare.domain.auth.oauth;
 
-import com.itcen.censquare.domain.member.entity.Role;
+import com.itcen.censquare.domain.member.entity.enums.Role;
 import java.util.Collections;
 import java.util.Map;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,7 +26,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     Map<String, Object> attributes = oAuth2User.getAttributes();
 
     return new DefaultOAuth2User(
-        Collections.singleton(new SimpleGrantedAuthority(Role.USER.getAuthority())),
+        Collections.singleton(new SimpleGrantedAuthority(Role.USER.getText())),
         attributes,
         "id"  // id: OAuth2User.getName()으로 접근 가능
     );
