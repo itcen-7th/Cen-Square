@@ -69,6 +69,15 @@ jobs:
               docker stop spring-app || true
               docker rm spring-app || true
 
+              echo "Dockerfile 존재 여부 확인합니다"
+              if [ -f Dockerfile ]; then
+                echo "✅ Dockerfile이 존재합니다. Docker 빌드를 시작합니다."
+              else
+                echo "❌ Dockerfile이 존재하지 않습니다. 복사 경로 또는 이전 단계 확인이 필요합니다."
+                ls -al
+                exit 1
+              fi
+
               echo "Docker 이미지 빌드 시작합니다"
               docker build -t spring-app .
 
