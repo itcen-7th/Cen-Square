@@ -55,7 +55,7 @@ jobs:
             echo "Private EC2로 SSH 접속 중입니다"
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
-              echo "Spring EC2 접속 성공했습니다다"
+              echo "Spring EC2 접속 성공했습니다"
 
               echo "spring-app 디렉토리로 이동 또는 생성합니다"
               cd ~/spring-app || mkdir -p ~/spring-app && cd ~/spring-app
