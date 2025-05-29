@@ -3,7 +3,7 @@ name: Deploy Spring App to EC2 via Bastion
 
 on:
   push:
-    branches: [ "dev" ]  # dev 브랜치에 push될 때 실행
+    branches: [ "feat/cicd" ]  # feat/cicd 브랜치에 push될 때 실행
 
 jobs:
   deploy:
