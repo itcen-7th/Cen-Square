@@ -29,10 +29,13 @@ jobs:
       - name: Generate Dockerfile dynamically
         run: |
           echo "Dockerfile을 생성합니다."
-          echo "FROM openjdk:17-jdk-slim
-          WORKDIR /app
-          COPY build/libs/*.jar app.jar
-          ENTRYPOINT [\"java\", \"-jar\", \"app.jar\"]" > Dockerfile
+          echo "Dockerfile을 생성합니다."
+          cat <<EOF > Dockerfile
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY build/libs/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+EOF
 
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
