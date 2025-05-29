@@ -76,7 +76,7 @@ jobs:
         run: ls -al
 
       - name: Upload project to Bastion server
-        uses: appleboy/scp-action@v0.1.8
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
