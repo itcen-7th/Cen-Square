@@ -39,7 +39,7 @@ jobs:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "."
+          source: "build/libs/*,Dockerfile" 
           target: "~/spring-deploy"
 
       - name: SSH into Bastion and deploy to Spring EC2
@@ -71,9 +71,9 @@ jobs:
 
               echo "Dockerfile 존재 여부 확인합니다"
               if [ -f Dockerfile ]; then
-                echo "✅ Dockerfile이 존재합니다. Docker 빌드를 시작합니다."
+                echo "[생성]Dockerfile이 존재합니다. Docker 빌드를 시작합니다."
               else
-                echo "❌ Dockerfile이 존재하지 않습니다. 복사 경로 또는 이전 단계 확인이 필요합니다."
+                echo "[실패]Dockerfile이 존재하지 않습니다. 복사 경로 또는 이전 단계 확인이 필요합니다."
                 ls -al
                 exit 1
               fi
