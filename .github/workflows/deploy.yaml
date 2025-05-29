@@ -25,17 +25,13 @@ jobs:
           chmod +x ./gradlew 
           ./gradlew build -x test
 
-
       - name: Generate Dockerfile dynamically
         run: |
           echo "Dockerfile을 생성합니다."
-          echo "Dockerfile을 생성합니다."
-          cat <<EOF > Dockerfile
-          FROM openjdk:17-jdk-slim
-          WORKDIR /app
-          COPY build/libs/*.jar app.jar
-          ENTRYPOINT ["java", "-jar", "app.jar"]
-          EOF
+          echo 'FROM openjdk:17-jdk-slim' > Dockerfile
+          echo 'WORKDIR /app' >> Dockerfile
+          echo 'COPY build/libs/*.jar app.jar' >> Dockerfile
+          echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
 
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
