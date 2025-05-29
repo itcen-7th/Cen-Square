@@ -94,9 +94,7 @@ jobs:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: |
-            ./Dockerfile
-            ./app.jar
+          source: ./Dockerfile ./app.jar
           target: "~/spring-deploy"
           debug: true
           
