@@ -49,8 +49,9 @@ jobs:
             else
           echo "Dockerfile이 존재하지 않습니다."
           fi    
+
       - name: Check files for SCP
-         run: |
+        run: |
           echo "== 현재 디렉토리 확인 =="
           pwd
           echo "== Dockerfile 확인 =="
