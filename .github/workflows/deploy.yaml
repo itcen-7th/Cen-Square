@@ -60,7 +60,14 @@ jobs:
           ls -l build/libs/*.jar || echo "JAR 파일 없음!"
       
       - name: Rename jar for consistent SCP
-        run: cp build/libs/cen-square-0.0.1-SNAPSHOT.jar app.jar
+        run: cp build/libs/cen-square-0.0.1-SNAPSHOT.jar ./app.jar
+
+      - name: Check existence of files
+        run: |
+          echo "== Current Directory =="
+          pwd
+          echo "== Files =="
+          ls -al
 
       - name: Upload project to Bastion server
         uses: appleboy/scp-action@v0.1.7
