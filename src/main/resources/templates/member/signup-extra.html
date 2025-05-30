@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>회원가입 추가 기입</title>
   <link rel="stylesheet" th:href="@{/css/member/signup-extra.css}">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
 <div class="signup-container">
@@ -54,28 +55,5 @@
 </div>
 
 <script th:src="@{/js/member/signup-extra.js}"></script>
-<script>
-  document.querySelector("#extraForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const batchVal = document.querySelector("#batchInput").value;
-    const payload = {
-      batchNumber: batchVal === "0" ? null : Number(batchVal),
-      nickname: document.querySelector("#nickname").value,
-      name: document.querySelector("#name").value
-    };
-
-    await fetch("/api/v1/member/signup-extra", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
-    });
-
-    alert("저장 완료!");
-
-    window.location.href = "/";
-  });
-
-</script>
 </body>
 </html>

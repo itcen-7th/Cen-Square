@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ JS loaded");
+  initStepUI();
+  initFormSubmit();
+});
 
+// 단계별 동적 UI
+function initStepUI() {
   const steps = document.querySelectorAll(".step");
   const nextBtn = document.querySelector(".next-btn");
   const submitBtn = document.querySelector(".submit-btn");
@@ -21,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
       steps[currentStep].querySelector("input").focus();
 
       if (currentStep === steps.length - 1) {
-        // 마지막 단계 진입 시: 다음 버튼 숨기고, 제출 버튼 표시
         nextBtn.classList.add("hidden");
         submitBtn.classList.remove("hidden");
       }
@@ -41,4 +44,34 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-});
+}
+
+// 서버로 데이터 전송 로직
+function initFormSubmit() {
+  const form = document.querySelector("#extraForm");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const batchVal = document.querySelector("#batchInput").value;
+    const payload = {
+      batchNumber: batchVal === "0" ? null : Number(batchVal),
+      nickname: document.querySelector("#nickname").value,
+      name: document.querySelector("#name").value
+    };
+
+    try {
+      await axios.post("/api/v1/member/signup-extra", payload, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      alert("저장 완료!");
+      window.location.href = "/";
+    } catch (error) {
+      console.error("전송 실패:", error);
+      alert("저장에 실패했습니다. 다시 시도해주세요.");
+    }
+  });
+}
