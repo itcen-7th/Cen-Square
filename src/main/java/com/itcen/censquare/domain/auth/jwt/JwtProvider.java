@@ -15,23 +15,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtProvider {
 
-  private final String accessSecret;
-  private final String refreshSecret;
-
-  private final Map<TokenType, Long> EXPIRATIONS = Map.of(
-      TokenType.ACCESS, 15 * 60 * 1000L, // 15분
-      TokenType.REFRESH, 7 * 24 * 60 * 1000L // 7일
-  );
-
+  private final Map<TokenType, Long> EXPIRATIONS = new EnumMap<>(TokenType.class);
   private final Map<TokenType, Key> keys = new EnumMap<>(TokenType.class);
 
   public JwtProvider(@Value("${jwt.secret.access}") String accessSecret,
-      @Value("${jwt.secret.refresh}") String refreshSecret) {
-    this.accessSecret = accessSecret;
-    this.refreshSecret = refreshSecret;
-
+      @Value("${jwt.secret.refresh}") String refreshSecret,
+      @Value("${jwt.expiration.access}") long accessExpiration,
+      @Value("${jwt.expiration.refresh}") long refreshExpiration
+  ) {
     keys.put(TokenType.ACCESS, Keys.hmacShaKeyFor(accessSecret.getBytes()));
     keys.put(TokenType.REFRESH, Keys.hmacShaKeyFor(refreshSecret.getBytes()));
+
+    EXPIRATIONS.put(TokenType.ACCESS, accessExpiration);
+    EXPIRATIONS.put(TokenType.REFRESH, refreshExpiration);
   }
 
   /**

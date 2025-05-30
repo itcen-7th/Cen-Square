@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원가입 추가 기입</title>
+  <link rel="stylesheet" th:href="@{/css/member/signup-extra.css}">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div class="signup-container">
+  <h2>임직원 소속 정보를<br>입력해 주세요.</h2>
+
+  <form id="extraForm" action="#" method="post">
+    <!-- Step 0: 기수 선택 -->
+    <div class="step" data-step="0">
+      <label for="batchInput">기수</label>
+      <input type="text" id="batchInput" name="batchInput" placeholder="기수를 입력하거나 선택하세요" list="batchList" required>
+      <datalist id="batchList">
+        <option value="0">해당 없음</option>
+        <option value="1"></option>
+        <option value="2"></option>
+        <option value="3"></option>
+        <option value="4"></option>
+        <option value="5"></option>
+        <option value="6"></option>
+        <option value="7"></option>
+        <option value="8"></option>
+        <option value="9"></option>
+        <option value="10"></option>
+        <option value="11"></option>
+        <option value="12"></option>
+        <option value="13"></option>
+      </datalist>
+    </div>
+
+    <!-- Step 1: 닉네임 -->
+    <div class="step hidden" data-step="1">
+      <label for="nickname">닉네임</label>
+      <input type="text" id="nickname" name="nickname" required>
+    </div>
+
+    <!-- Step 2: 이름 -->
+    <div class="step hidden" data-step="2">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+
+    <!-- 버튼 영역은 공통 -->
+    <div class="button-area">
+      <button type="button" class="next-btn">다음</button>
+      <button type="submit" class="submit-btn hidden">입력완료</button>
+    </div>
+  </form>
+
+</div>
+
+<script th:src="@{/js/member/signup-extra.js}"></script>
+</body>
+</html>
