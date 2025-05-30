@@ -15,10 +15,10 @@ public class PostService {
   private final PostRepository postRepository;
   private final PostMapper postMapper;
 
-  public void createPost(PostReqDto request, Member member) {
+  public Long createPost(PostReqDto request, Member member) {
 
     Post post = postMapper.toEntity(request, member);
 
-    postRepository.save(post);
+    return postRepository.save(post).getPostId();
   }
 }
