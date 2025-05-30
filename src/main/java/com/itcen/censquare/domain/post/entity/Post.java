@@ -40,7 +40,7 @@ public class Post extends TimeStampedEntity {
   @Column(name = "category", nullable = false)
   private Category category;
 
-  @Column(name = "title", nullable = false, length = 255)
+  @Column(name = "title", nullable = false, length = 64)
   private String title;
 
   @Column(name = "content", columnDefinition = "TEXT")
