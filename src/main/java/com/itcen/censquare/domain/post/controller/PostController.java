@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +44,16 @@ public class PostController {
 
     PostDetailRespDto dto = postService.getPostBy(postId);
     return ResponseEntity.ok(dto);
+  }
+
+  @PutMapping("/{postId}")
+  public ResponseEntity<Void> updatePost(
+      @PathVariable Long postId,
+      @RequestBody @Valid PostReqDto request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    postService.updatePost(postId, request, userDetails.getMember());
+    return ResponseEntity.ok().build();
   }
 
 }
