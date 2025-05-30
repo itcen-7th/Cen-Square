@@ -1,6 +1,5 @@
 package com.itcen.censquare.domain.auth.oauth;
 
-
 import com.itcen.censquare.domain.auth.AuthConstants;
 import com.itcen.censquare.domain.auth.jwt.JwtProvider;
 import com.itcen.censquare.domain.auth.jwt.TokenType;
@@ -8,6 +7,7 @@ import com.itcen.censquare.domain.auth.util.CookieUtil;
 import com.itcen.censquare.domain.member.entity.Member;
 import com.itcen.censquare.domain.member.entity.enums.Provider;
 import com.itcen.censquare.domain.member.entity.enums.Role;
+import com.itcen.censquare.domain.member.entity.enums.State;
 import com.itcen.censquare.domain.member.repository.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,8 +29,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-  private static final String REDIRECT_URL_AFTER_LOGIN = "/";
+  private static final String REDIRECT_HOME = "/";
+  public static final String REDIRECT_SIGNUP_EXTRA = "/member/signup-extra";
   private static final String OAUTH_ID_ATTRIBUTE = "id";
+  private static final String KAKAO_ACCOUNT_ATTRIBUTE = "kakao_account";
+  private static final String EMAIL_ATTRIBUTE = "email";
   public static final String ERROR_MISSING_OAUTH_ID = "OAuth 응답에 'id' 가 존재하지 않습니다.";
 
   private final JwtProvider jwtProvider;
@@ -42,21 +45,31 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
       Authentication authentication) throws IOException, ServletException {
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
     String oauthId = extractOAuth2Id(oAuth2User);
-
-    Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes()
-        .get("kakao_account");
-    String email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
+    String email = extractEmail(oAuth2User);
 
     Member member = getOrCreateMember(oauthId, email);
     generateTokensAndSetCookies(response, String.valueOf(member.getMemberId()));
 
-    response.sendRedirect(REDIRECT_URL_AFTER_LOGIN);
+    if (member.getState() == State.NEEDS_MORE_INFO) {
+      response.sendRedirect(REDIRECT_SIGNUP_EXTRA);
+    } else {
+      response.sendRedirect(REDIRECT_HOME);
+    }
   }
 
   private static String extractOAuth2Id(OAuth2User oAuth2User) {
     return Optional.ofNullable(oAuth2User.getAttribute(OAUTH_ID_ATTRIBUTE))
         .map(String::valueOf)
         .orElseThrow(() -> new IllegalStateException(ERROR_MISSING_OAUTH_ID));
+  }
+
+  private String extractEmail(OAuth2User user) {
+    Object accountAttr = user.getAttributes().get(KAKAO_ACCOUNT_ATTRIBUTE);
+    if (accountAttr instanceof Map<?, ?> accountMap) {
+      Object email = accountMap.get(EMAIL_ATTRIBUTE);
+      return email != null ? email.toString() : null;
+    }
+    return null;
   }
 
   private Member getOrCreateMember(String oauthId, String email) {
@@ -68,6 +81,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .provider(Provider.KAKAO)
                     .role(Role.USER)
                     .email(email)
+                    .state(State.NEEDS_MORE_INFO)
                     .build()
 
             ))
@@ -106,4 +120,3 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
   }
 
 }
-

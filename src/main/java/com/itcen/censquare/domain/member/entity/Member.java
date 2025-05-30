@@ -2,6 +2,7 @@ package com.itcen.censquare.domain.member.entity;
 
 import com.itcen.censquare.domain.member.entity.enums.Provider;
 import com.itcen.censquare.domain.member.entity.enums.Role;
+import com.itcen.censquare.domain.member.entity.enums.State;
 import com.itcen.censquare.global.entity.TimeStampedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,13 +43,25 @@ public class Member extends TimeStampedEntity {
 
   private Long batchNumber;
 
-  //  @Column(nullable = false, length = 50)
+  @Column(length = 50)
   private String nickname;
 
-  //  @Column(nullable = false, length = 50)
+  @Column(length = 50)
   private String name;
 
   @Column(nullable = false, length = 50)
   private String email;
 
+  @Enumerated(EnumType.STRING)
+  private State state;
+
+  public void updateExtraInfo(Long batchNumber, String nickname, String name) {
+    this.batchNumber = batchNumber;
+    this.nickname = nickname;
+    this.name = name;
+  }
+
+  public void changeState(State newState) {
+    this.state = newState;
+  }
 }
