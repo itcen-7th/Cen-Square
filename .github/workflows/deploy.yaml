@@ -40,7 +40,7 @@ jobs:
       - name: Save PEM key as bastion.pem
         run: |
           echo "${{ secrets.EC2_KEY }}" > bastion.pem
-          chmod 600 bastion.pem
+          chmod 644 bastion.pem
 
       # 🔐 bastion.pem을 Bastion으로 업로드
       - name: Upload bastion.pem to Bastion
