@@ -81,10 +81,10 @@ jobs:
             echo "🌐 Bastion 내부로 진입 완료"
 
             # 🔐 pem 파일 권한 설정
-            chmod 600 ~/.ssh/spring-ec2.pem
+            chmod 600 ~/.ssh/bastion.pem
 
             echo "📁 spring-app 디렉토리로 이동"
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
               echo "✅ Spring EC2 접속 성공"
 
@@ -98,13 +98,13 @@ jobs:
 
             # 📤 파일 복사
             echo "[Bastion] Dockerfile 전송 중..."
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
 
             echo "[Bastion] app.jar 전송 중..."
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
 
             # 🚀 Spring EC2에서 Docker build 및 실행
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
               cd ~/spring-app
 
