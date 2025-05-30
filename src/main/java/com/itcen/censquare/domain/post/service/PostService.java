@@ -10,6 +10,7 @@ import com.itcen.censquare.domain.post.repository.PostRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,5 +44,17 @@ public class PostService {
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
     return postMapper.toDetailDto(post);
+  }
+
+  public void updatePost(Long postId, PostReqDto request, Member member) {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+    if (!post.getMember().getMemberId().equals(member.getMemberId())) {
+      throw new AccessDeniedException("게시글 수정 권한이 없습니다.");
+    }
+
+    post.update(request.getTitle(), request.getContent(), request.getCategory());
+
   }
 }

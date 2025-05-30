@@ -59,4 +59,10 @@ public class Post extends TimeStampedEntity {
 
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
+
+  public void update(String title, String content, Category category) {
+    this.title = title;
+    this.content = content;
+    this.category = category;
+  }
 }
