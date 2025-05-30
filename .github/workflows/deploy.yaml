@@ -1,17 +1,16 @@
-# GitHub Actions: dev 브랜치에 push되면 실행됨
 name: Deploy Spring App to EC2 via Bastion
 
 on:
   push:
-    branches: [ "feat/cicd" ]  # feat/cicd 브랜치에 push될 때 실행
+    branches: [ "feat/cicd" ]
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04  # GitHub가 제공하는 우분투 가상 머신 사용
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # GitHub repo의 코드를 받아옴
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -21,72 +20,40 @@ jobs:
 
       - name: Build JAR with Gradle
         run: |
-          echo "Gradle 빌드를 시작합니다."
-          chmod +x ./gradlew 
+          chmod +x ./gradlew
           ./gradlew build -x test
 
       - name: Generate Dockerfile dynamically
         run: |
-          echo "Dockerfile을 생성합니다."
           echo 'FROM openjdk:17-jdk-slim' > Dockerfile
           echo 'WORKDIR /app' >> Dockerfile
           echo 'COPY build/libs/*.jar app.jar' >> Dockerfile
           echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
-          echo "=======Dockerfile 내용======="
-          cat Dockerfile
 
-      - name: Check files before SCP
-        run: |
-          echo "[디버깅] 현재 디렉토리 파일 목록:"
-          ls -al
-
-          echo "[디버깅] build/libs 디렉토리 파일 목록:"
-          ls -al build/libs || echo "build/libs 디렉토리가 없습니다."
-
-          echo "[디버깅] Dockerfile 존재 여부 확인:"
-            if [ -f Dockerfile ]; then
-          echo "Dockerfile이 존재합니다."
-            else
-          echo "Dockerfile이 존재하지 않습니다."
-          fi    
-
-      - name: Check files for SCP
-        run: |
-          echo "== 현재 디렉토리 확인 =="
-          pwd
-          echo "== Dockerfile 확인 =="
-          ls -l Dockerfile || echo "없음!"
-          echo "== JAR 파일 확인 =="
-          ls -l build/libs/*.jar || echo "JAR 파일 없음!"
-      
       - name: Rename jar for consistent SCP
         run: cp build/libs/cen-square-0.0.1-SNAPSHOT.jar ./app.jar || cp build/libs/cen-square-0.0.1-SNAPSHOT-plain.jar ./app.jar
 
       - name: Confirm app.jar existence
         run: ls -l app.jar
 
-      - name: Check existence of files
-        run: |
-          echo "== Current Directory =="
-          pwd
-          echo "== Files =="
-          ls -al
+      - name: Upload bastion.pem to Bastion server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.BASTION_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "./bastion.pem"
+          target: "~/.ssh/"
+          debug: true
 
-      - name: Final check before SCP
-        run: ls -al
-
-      - name: Check if remote directory exists
+      - name: Set permission for bastion.pem on Bastion
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            if [ -d ~/spring-deploy ]; then
-              echo "폴더가 존재합니다."
-            else
-              echo "폴더가 없습니다."
-            fi
+            chmod 600 ~/.ssh/bastion.pem
 
       - name: Upload Dockerfile to Bastion server
         uses: appleboy/scp-action@v0.1.7
@@ -107,7 +74,7 @@ jobs:
           source: "./app.jar"
           target: "~/spring-deploy"
           debug: true
-          
+
       - name: SSH into Bastion and deploy to Spring EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -115,56 +82,32 @@ jobs:
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            set -e  # 에러 발생 시 즉시 종료
+            set -e
+            echo "Spring EC2로 파일 복사 및 Docker 배포 시작"
 
-            echo "Private EC2로 SSH 접속 중입니다"
+            # spring-app 디렉토리 준비
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} "mkdir -p ~/spring-app && rm -rf ~/spring-app/*"
+
+            # Dockerfile과 app.jar 복사
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+
+            # Spring EC2에 접속해서 Docker 배포 실행
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
-              echo "Spring EC2 접속 성공했습니다"
+              cd ~/spring-app
 
-              echo "[디버깅] Bastion ~/spring-deploy 파일 목록:"
-              ls -al ~/spring-deploy
-
-              echo "spring-app 디렉토리로 이동 또는 생성합니다"
-              cd ~/spring-app || mkdir -p ~/spring-app && cd ~/spring-app
-
-              echo "기존 파일 정리"
-              [ "$PWD" = "$HOME/spring-app" ] && rm -rf *
-
-              echo "[DEBUG] Bastion에서 프로젝트 복사 전 spring-deploy 내용 확인:"
-              ls -al /home/ubuntu/spring-deploy
-
-              echo "[Bastion] Spring EC2로 Dockerfile 전송"
-              scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
-
-              echo "[Bastion] Spring EC2로 app.jar 전송"
-              scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
-
-
-              echo "[DEBUG] 복사 후 spring-app 디렉토리 내용:"
-              ls -al
-
-              echo "Bastion에서 프로젝트 복사합니다"
-              cp -a /home/ubuntu/spring-deploy/. .
-
-              echo "기존 Docker 컨테이너 정리합니다"
               docker stop spring-app || true
               docker rm spring-app || true
 
-              echo "Dockerfile 존재 여부 확인합니다"
               if [ -f Dockerfile ]; then
-                echo "[생성]Dockerfile이 존재합니다. Docker 빌드를 시작합니다."
+                echo "Dockerfile 존재 확인. Docker 이미지 빌드 시작."
               else
-                echo "[실패]Dockerfile이 존재하지 않습니다. 복사 경로 또는 이전 단계 확인이 필요합니다."
-                ls -al
+                echo "Dockerfile이 없습니다. 종료합니다."
                 exit 1
               fi
 
-              echo "Docker 이미지 빌드 시작합니다"
               docker build -t spring-app .
-
-              echo "Docker 컨테이너 실행합니다"
               docker run -d --name spring-app -p 8888:8080 spring-app
-
-              echo "배포 완료했습니다"
+              echo "배포 완료"
             EOF
