@@ -23,100 +23,35 @@ jobs:
           chmod +x ./gradlew 
           ./gradlew build -x test
 
-      - name: Generate Dockerfile dynamically
-        run: |
-          echo 'FROM openjdk:17-jdk-slim' > Dockerfile
-          echo 'WORKDIR /app' >> Dockerfile
-          echo 'COPY app.jar app.jar' >> Dockerfile
-          echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
-
       - name: Rename jar for consistent SCP
-        run: cp build/libs/cen-square-0.0.1-SNAPSHOT.jar ./app.jar || cp build/libs/cen-square-0.0.1-SNAPSHOT-plain.jar ./app.jar
+        run: |
+          cp build/libs/cen-square-0.0.1-SNAPSHOT.jar ./app.jar || \
+          cp build/libs/cen-square-0.0.1-SNAPSHOT-plain.jar ./app.jar
 
       - name: Confirm app.jar existence
         run: ls -l app.jar
 
-      # 🔐 bastion.pem 키파일 생성
-      - name: Save PEM key as bastion.pem
+      - name: Docker login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and Push ARM64 Image
         run: |
-          echo "${{ secrets.EC2_KEY }}" > bastion.pem
-          chmod 644 bastion.pem
+          docker buildx build \
+            --platform linux/arm64 \
+            -t ${{ secrets.DOCKER_USERNAME }}/itcen:latest \
+            --push .
 
-      # 🔐 bastion.pem을 Bastion으로 업로드
-      - name: Upload bastion.pem to Bastion
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.BASTION_HOST }}
-          username: ${{ secrets.BASTION_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "./bastion.pem"
-          target: "~/.ssh/"
-          debug: true
-
-      # 🚀 필요한 파일들 업로드
-      - name: Upload Dockerfile to Bastion
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.BASTION_HOST }}
-          username: ${{ secrets.BASTION_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "./Dockerfile"
-          target: "~/spring-deploy"
-          debug: true
-
-      - name: Upload app.jar to Bastion
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.BASTION_HOST }}
-          username: ${{ secrets.BASTION_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "./app.jar"
-          target: "~/spring-deploy"
-          debug: true
-
-      # 🛠️ Bastion에서 Spring EC2로 배포
-      - name: SSH into Bastion and deploy to Spring EC2
+      - name: Deploy to private EC2 via Bastion
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.BASTION_HOST }}
+          host: ${{ secrets.SPRING_EC2_PRIVATE_IP }}          # 🔐 프라이빗 EC2 내부 IP
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
+          proxy_host: ${{ secrets.BASTION_HOST }}             # 🟢 퍼블릭 Bastion 서버
+          proxy_username: ${{ secrets.BASTION_USER }}
+          proxy_key: ${{ secrets.EC2_KEY }}
           script: |
-            set -e
-
-            echo "🌐 Bastion 내부로 진입 완료"
-            chmod 600 ~/.ssh/bastion.pem
-
-            echo "📁 Spring EC2 디렉토리 준비 중..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
-              set -e
-              echo "✅ Spring EC2 접속 성공"
-
-              mkdir -p ~/spring-app
-              cd ~/spring-app
-              rm -rf *
-            EOF
-
-            echo "[Bastion] Dockerfile 전송 중..."
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
-
-            echo "[Bastion] app.jar 전송 중..."
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
-
-            echo "[Bastion] Spring EC2에서 Docker build 및 실행"
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
-              set -e
-              cd ~/spring-app
-
-              echo "🧹 기존 Docker 컨테이너 제거"
-              docker stop spring-app || true
-              docker rm spring-app || true
-
-              echo "🛠️ Docker 이미지 빌드"
-              docker build -t spring-app .
-
-              echo "🚀 Docker 컨테이너 실행"
-              docker run -d --name spring-app -p 8888:8080 spring-app
-
-              echo "🎉 배포 완료!"
-            EOF
+            ls
