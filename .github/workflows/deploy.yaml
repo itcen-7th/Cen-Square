@@ -36,8 +36,14 @@ jobs:
       - name: Confirm app.jar existence
         run: ls -l app.jar
 
-      # 🔐 spring-ec2.pem을 Bastion으로 업로드
-      - name: Upload spring-ec2.pem to Bastion
+      # 🔐 bastion.pem 키파일 생성
+      - name: Save PEM key as bastion.pem
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > bastion.pem
+          chmod 600 bastion.pem
+
+      # 🔐 bastion.pem을 Bastion으로 업로드
+      - name: Upload bastion.pem to Bastion
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
@@ -79,11 +85,9 @@ jobs:
             set -e
 
             echo "🌐 Bastion 내부로 진입 완료"
-
-            # 🔐 pem 파일 권한 설정
             chmod 600 ~/.ssh/bastion.pem
 
-            echo "📁 spring-app 디렉토리로 이동"
+            echo "📁 Spring EC2 디렉토리 준비 중..."
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
               echo "✅ Spring EC2 접속 성공"
@@ -91,19 +95,15 @@ jobs:
               mkdir -p ~/spring-app
               cd ~/spring-app
               rm -rf *
-
-              echo "📦 Bastion에서 파일 복사 중..."
-              exit
             EOF
 
-            # 📤 파일 복사
             echo "[Bastion] Dockerfile 전송 중..."
             scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
 
             echo "[Bastion] app.jar 전송 중..."
             scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
 
-            # 🚀 Spring EC2에서 Docker build 및 실행
+            echo "[Bastion] Spring EC2에서 Docker build 및 실행"
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
               cd ~/spring-app
