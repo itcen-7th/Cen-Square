@@ -1,6 +1,14 @@
 version: "3.9"
-
 services:
+  spring-app:
+    image: cenSquare:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cenSquare
+    ports:
+      - "8888:8080"
+
   redis:
     image: redis:latest
     container_name: redis
