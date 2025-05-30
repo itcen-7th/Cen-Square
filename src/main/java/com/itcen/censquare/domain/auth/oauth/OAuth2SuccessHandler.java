@@ -35,6 +35,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
   private static final String KAKAO_ACCOUNT_ATTRIBUTE = "kakao_account";
   private static final String EMAIL_ATTRIBUTE = "email";
   public static final String ERROR_MISSING_OAUTH_ID = "OAuth 응답에 'id' 가 존재하지 않습니다.";
+  public static final String ERROR_MISSING_EMAIL = "OAuth 응답에 email이 존재하지 않습니다.";
 
   private final JwtProvider jwtProvider;
   private final MemberRepository memberRepository;
@@ -44,8 +45,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+
     String oauthId = extractOAuth2Id(oAuth2User);
-    String email = extractEmail(oAuth2User);
+    String email = Optional.ofNullable(extractEmail(oAuth2User))
+        .orElseThrow(() -> new IllegalStateException(ERROR_MISSING_EMAIL));
 
     Member member = getOrCreateMember(oauthId, email);
     generateTokensAndSetCookies(response, String.valueOf(member.getMemberId()));
