@@ -3,20 +3,24 @@ package com.itcen.censquare.domain.member.controller;
 import com.itcen.censquare.domain.auth.AuthConstants;
 import com.itcen.censquare.domain.auth.oauth.CustomUserDetails;
 import com.itcen.censquare.domain.auth.util.CookieUtil;
+import com.itcen.censquare.domain.member.dto.MemberExtraReqDto;
 import com.itcen.censquare.domain.member.dto.MemberRespDto;
 import com.itcen.censquare.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,4 +59,11 @@ public class MemberController {
     return ResponseEntity.ok(memberService.getMyInfo(userDetails.getMember()));
   }
 
+  @PostMapping("/signup-extra")
+  public ResponseEntity<Void> signupExtraInfo(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestBody @Valid MemberExtraReqDto memberExtraReqDto) {
+    memberService.saveExtraInfo(userDetails.getMember(), memberExtraReqDto);
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
 }
