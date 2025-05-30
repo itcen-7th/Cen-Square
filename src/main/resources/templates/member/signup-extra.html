@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>추가 정보 입력</title>
+  <link rel="stylesheet" th:href="@{/css/member/signup-extra.css}">
+</head>
+<body>
+<div class="signup-container">
+  <h2>임직원 소속 정보를<br>입력해 주세요.</h2>
+
+  <form id="extraForm" action="#" method="post">
+    <div class="step" data-step="0">
+      <label for="batch">기수</label>
+      <input type="text" id="batch" name="batch" required>
+    </div>
+
+    <div class="step hidden" data-step="1">
+      <label for="nickname">닉네임</label>
+      <input type="text" id="nickname" name="nickname" required>
+    </div>
+
+    <div class="step hidden" data-step="2">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+
+    <!-- 버튼 영역은 공통 -->
+    <div class="button-area">
+      <button type="button" class="next-btn">다음</button>
+      <button type="submit" class="submit-btn hidden">입력완료</button>
+    </div>
+  </form>
+
+</div>
+
+<script th:src="@{/js/member/signup-extra.js}"></script>
+<script>
+  document.querySelector("#extraForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const payload = {
+      batchNumber: document.querySelector("#batch").value,
+      nickname: document.querySelector("#nickname").value,
+      name: document.querySelector("#name").value
+    };
+
+    await fetch("/api/v1/member/signup-extra", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    alert("저장 완료!");
+
+    window.location.href = "/";
+  });
+
+</script>
+</body>
+</html>
