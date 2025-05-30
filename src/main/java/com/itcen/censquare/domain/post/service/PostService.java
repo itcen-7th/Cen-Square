@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostService {
 
   private final PostRepository postRepository;
@@ -26,6 +28,7 @@ public class PostService {
     return postRepository.save(post).getPostId();
   }
 
+  @Transactional(readOnly = true)
   public List<PostListRespDto> getPosts() {
     List<Post> posts = postRepository.findAll();
     return posts.stream()
@@ -34,6 +37,8 @@ public class PostService {
   }
 
   public PostDetailRespDto getPostBy(Long postId) {
+    postRepository.incrementViewCount(postId); // 조회수 1 증가
+
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
