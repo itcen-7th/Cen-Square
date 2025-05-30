@@ -97,3 +97,28 @@ input {
 .submit-btn:hover {
   background-color: #007bff;
 }
+
+/* 기수 드롭다운 스타일*/
+.choices__list--dropdown {
+  max-height: 200px; /* 약 5개 정도 */
+  overflow-y: auto;
+  background-color: #e6f0ff; /* 연한 남색 */
+  border: 1px solid #b5cfff;
+  border-radius: 8px;
+}
+
+.choices__item--selectable {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.choices__list--dropdown .choices__item--selectable:hover {
+  background-color: #d0e5ff;
+}
+
+.choices__inner {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
