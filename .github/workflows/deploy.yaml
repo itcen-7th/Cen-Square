@@ -20,14 +20,14 @@ jobs:
 
       - name: Build JAR with Gradle
         run: |
-          chmod +x ./gradlew
+          chmod +x ./gradlew 
           ./gradlew build -x test
 
       - name: Generate Dockerfile dynamically
         run: |
           echo 'FROM openjdk:17-jdk-slim' > Dockerfile
           echo 'WORKDIR /app' >> Dockerfile
-          echo 'COPY build/libs/*.jar app.jar' >> Dockerfile
+          echo 'COPY app.jar app.jar' >> Dockerfile
           echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
 
       - name: Rename jar for consistent SCP
@@ -36,26 +36,19 @@ jobs:
       - name: Confirm app.jar existence
         run: ls -l app.jar
 
-      - name: Upload bastion.pem to Bastion server
+      # 🔐 spring-ec2.pem을 Bastion으로 업로드
+      - name: Upload spring-ec2.pem to Bastion
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "./bastion.pem"
+          source: "./spring-ec2.pem"
           target: "~/.ssh/"
           debug: true
 
-      - name: Set permission for bastion.pem on Bastion
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.BASTION_HOST }}
-          username: ${{ secrets.BASTION_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            chmod 600 ~/.ssh/bastion.pem
-
-      - name: Upload Dockerfile to Bastion server
+      # 🚀 필요한 파일들 업로드
+      - name: Upload Dockerfile to Bastion
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
@@ -65,7 +58,7 @@ jobs:
           target: "~/spring-deploy"
           debug: true
 
-      - name: Upload app.jar to Bastion server
+      - name: Upload app.jar to Bastion
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
@@ -75,6 +68,7 @@ jobs:
           target: "~/spring-deploy"
           debug: true
 
+      # 🛠️ Bastion에서 Spring EC2로 배포
       - name: SSH into Bastion and deploy to Spring EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -83,31 +77,46 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             set -e
-            echo "Spring EC2로 파일 복사 및 Docker 배포 시작"
 
-            # spring-app 디렉토리 준비
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} "mkdir -p ~/spring-app && rm -rf ~/spring-app/*"
+            echo "🌐 Bastion 내부로 진입 완료"
 
-            # Dockerfile과 app.jar 복사
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+            # 🔐 pem 파일 권한 설정
+            chmod 600 ~/.ssh/spring-ec2.pem
 
-            # Spring EC2에 접속해서 Docker 배포 실행
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/bastion.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
+            echo "📁 spring-app 디렉토리로 이동"
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
+              set -e
+              echo "✅ Spring EC2 접속 성공"
+
+              mkdir -p ~/spring-app
+              cd ~/spring-app
+              rm -rf *
+
+              echo "📦 Bastion에서 파일 복사 중..."
+              exit
+            EOF
+
+            # 📤 파일 복사
+            echo "[Bastion] Dockerfile 전송 중..."
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ~/spring-deploy/Dockerfile ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+
+            echo "[Bastion] app.jar 전송 중..."
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ~/spring-deploy/app.jar ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }}:~/spring-app/
+
+            # 🚀 Spring EC2에서 Docker build 및 실행
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/spring-ec2.pem ubuntu@${{ secrets.SPRING_EC2_PRIVATE_IP }} << 'EOF'
               set -e
               cd ~/spring-app
 
+              echo "🧹 기존 Docker 컨테이너 제거"
               docker stop spring-app || true
               docker rm spring-app || true
 
-              if [ -f Dockerfile ]; then
-                echo "Dockerfile 존재 확인. Docker 이미지 빌드 시작."
-              else
-                echo "Dockerfile이 없습니다. 종료합니다."
-                exit 1
-              fi
-
+              echo "🛠️ Docker 이미지 빌드"
               docker build -t spring-app .
+
+              echo "🚀 Docker 컨테이너 실행"
               docker run -d --name spring-app -p 8888:8080 spring-app
-              echo "배포 완료"
+
+              echo "🎉 배포 완료!"
             EOF
