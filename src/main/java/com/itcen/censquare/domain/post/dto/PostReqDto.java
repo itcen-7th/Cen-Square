@@ -14,10 +14,10 @@ public class PostReqDto {
   private Category category;
 
   @NotBlank(message = "제목을 입력해주세요.")
-  @Size(max = 255, message = "제목은 255자 이내여야 합니다.")
+  @Size(max = 64, message = "제목은 64자 이내여야 합니다.")
   private String title;
 
   @NotBlank(message = "내용을 입력해주세요.")
   private String content;
-  
+
 }
