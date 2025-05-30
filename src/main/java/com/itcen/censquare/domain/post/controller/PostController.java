@@ -3,6 +3,7 @@ package com.itcen.censquare.domain.post.controller;
 import com.itcen.censquare.domain.auth.oauth.CustomUserDetails;
 import com.itcen.censquare.domain.post.dto.PostReqDto;
 import com.itcen.censquare.domain.post.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,10 +20,11 @@ public class PostController {
   private final PostService postService;
 
   @PostMapping
-  public ResponseEntity<String> createPost(@RequestBody PostReqDto request,
+  public ResponseEntity<String> createPost(
+      @Valid @RequestBody PostReqDto request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    postService.createPost(request, userDetails.getMember());
-    return ResponseEntity.ok("게시글이 등록되었습니다.");
+    Long postId = postService.createPost(request, userDetails.getMember());
+    return ResponseEntity.ok("게시글이 등록되었습니다." + postId);
   }
 
 }
