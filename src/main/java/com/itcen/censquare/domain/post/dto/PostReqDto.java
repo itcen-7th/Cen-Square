@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public class PostReqDto {
 
-  private Long memberId;
   private Category category;
   private String title;
   private String content;
